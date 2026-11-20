@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block titulo %}Candidatos · Mendes RH{% endblock %}
+{% block conteudo %}
+{% from "_icons.html" import icon %}
+<header class="pagina-cabecalho">
+  <div class="pagina-titulo">
+    <h1>Gestão de Candidatos</h1>
+    <p class="pagina-subtitulo">Organize, consulte e acompanhe todos os talentos cadastrados.</p>
+  </div>
+  <div class="acoes-pagina">
+    <a href="{{ url_for('principal.importar') }}" class="btn btn-secundario">{{ icon('upload') }} Importar Excel</a>
+    <a href="{{ url_for('principal.exportar') }}" class="btn btn-secundario">{{ icon('download') }} Exportar</a>
+    <a href="{{ url_for('principal.novo_candidato') }}" class="btn btn-primario">{{ icon('plus') }} Novo Candidato</a>
+  </div>
+</header>
+
+<form method="get" action="{{ url_for('principal.candidatos') }}" class="painel">
+  <div class="filtros">
+    <div class="campo"><label for="f-nome">Nome</label><input id="f-nome" type="text" name="nome" value="{{ filtros.nome }}" placeholder="Nome do candidato"></div>
+    <div class="campo"><label for="f-telefone">Telefone</label><input id="f-telefone" type="text" name="telefone" value="{{ filtros.telefone }}" placeholder="DDD + número"></div>
+    <div class="campo"><label for="f-cidade">Cidade</label><input id="f-cidade" type="text" name="cidade" value="{{ filtros.cidade }}" placeholder="Cidade"></div>
+    <div class="campo"><label for="f-estado">Estado</label><input id="f-estado" type="text" name="estado" value="{{ filtros.estado }}" placeholder="UF"></div>
+    <div class="campo"><label for="f-vaga">Vaga pretendida</label><input id="f-vaga" type="text" name="vaga" value="{{ filtros.vaga }}" placeholder="Cargo de interesse"></div>
+    <div class="campo"><label for="f-escolaridade">Escolaridade</label><select id="f-escolaridade" name="escolaridade"><option value="">Todas</option>{% for opcao in ['Fundamental','Médio','Superior','Pós-graduação','MBA'] %}<option value="{{ opcao }}" {{ 'selected' if filtros.escolaridade == opcao }}>{{ opcao }}</option>{% endfor %}</select></div>
+    <div class="campo"><label for="f-status">Status</label><select id="f-status" name="status"><option value="">Todos</option>{% for opcao in ['novo','ativo','contato','aguardando','convocado','contratado','reprovado'] %}<option value="{{ opcao }}" {{ 'selected' if filtros.status == opcao }}>{{ opcao|capitalize }}</option>{% endfor %}</select></div>
+    <div class="campo"><label for="f-periodo">Cadastro a partir de</label><input id="f-periodo" type="date" name="periodo" value="{{ filtros.periodo }}"></div>
+  </div>
+  <div class="form-acoes">
+    <a href="{{ url_for('principal.candidatos') }}" class="btn btn-fantasma">Limpar filtros</a>
+    <button type="submit" class="btn btn-primario">{{ icon('filter') }} Aplicar filtros</button>
+  </div>
+</form>
+
+<form method="post" action="{{ url_for('principal.criar_grupo') }}">
+  <section class="painel">
+    <div class="painel-cabecalho">
+      <div class="painel-titulo">
+        <h2>Candidatos cadastrados</h2>
+        <p class="painel-subtitulo">{{ total }} registro(s) encontrado(s) · página {{ pagina or 1 }} de {{ total_paginas or 1 }}.</p>
+      </div>
+      <div class="acoes-pagina">
+        <div class="campo" style="width:180px"><input type="text" name="nome" placeholder="Nome do grupo"></div>
+        <button type="submit" class="btn btn-secundario">{{ icon('message') }} Criar grupo com selecionados</button>
+      </div>
+    </div>
+    <div class="tabela-wrap">
+      <table class="tabela">
+        <thead>
+          <tr><th></th><th>Nome completo</th><th>Telefone</th><th>Cidade</th><th>Vaga pretendida</th><th>Cadastro</th><th>Status</th><th>Ações</th></tr>
+        </thead>
+        <tbody>
+          {% for c in candidatos %}
+            {% set rotulo = {'novo':'Novo','ativo':'Ativo','contato':'Em contato','aguardando':'Aguardando','convocado':'Convocado','contratado':'Contratado','reprovado':'Reprovado'}.get(c.status, 'Novo') %}
+            {% set classe = {'novo':'status-novo','ativo':'status-ativo','contato':'status-contato','aguardando':'status-aguardando','convocado':'status-convocado','contratado':'status-contratado','reprovado':'status-reprovado'}.get(c.status, 'status-novo') %}
+            <tr>
+              <td><input type="checkbox" name="selecionados" value="{{ c.id }}" class="campo-check"></td>
+              <td class="celula-forte">{{ c.nome }}</td>
+              <td>+55 {{ c.telefone }}</td>
+              <td>{{ c.cidade or '—' }}</td>
+              <td>{{ c.vaga or '—' }}</td>
+              <td class="celula-suave">{{ c.criado_em[:10] }}</td>
+              <td><span class="status {{ classe }}">{{ rotulo }}</span></td>
+              <td>
+                <div class="acoes-tabela">
+                  <a href="{{ url_for('principal.ver_candidato', ident=c.id) }}" class="botao-acao" title="Visualizar">{{ icon('eye') }}</a>
+                  <a href="{{ url_for('principal.editar_candidato', ident=c.id) }}" class="botao-acao" title="Editar">{{ icon('pencil') }}</a>
+                  <a href="{{ url_for('principal.pagina_whatsapp', candidato=c.id) }}" class="botao-acao" title="Conversar no WhatsApp">{{ icon('message') }}</a>
+                  {% if c.link %}<a href="{{ url_for('principal.curriculo', ident=c.id) }}" class="botao-acao" title="Baixar currículo">{{ icon('download') }}</a>{% endif %}
+                  <button type="submit" formaction="{{ url_for('principal.excluir_candidato', ident=c.id) }}" class="botao-acao perigo" title="Excluir" onclick="return confirm('Excluir este candidato?')">{{ icon('trash') }}</button>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="8" class="vazio">Nenhum candidato encontrado com os filtros selecionados.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="paginacao">
+      <span>Página {{ pagina or 1 }} de {{ total_paginas or 1 }}</span>
+      <div class="acoes-pagina">
+        {% if (pagina or 1) > 1 %}<a href="{{ url_for('principal.candidatos', **filtros|combine({'pagina': pagina - 1})) }}" class="btn btn-secundario btn-pequeno">Anterior</a>{% endif %}
+        {% if (pagina or 1) < (total_paginas or 1) %}<a href="{{ url_for('principal.candidatos', **filtros|combine({'pagina': pagina + 1})) }}" class="btn btn-secundario btn-pequeno">Próxima</a>{% endif %}
+      </div>
+    </div>
+  </section>
+</form>
+{% endblock %}

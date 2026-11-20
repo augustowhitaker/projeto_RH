@@ -1,0 +1,50 @@
+{% from "_icons.html" import icon %}
+<form method="post" action="{{ acao }}" enctype="multipart/form-data">
+  <section class="painel">
+    <div class="secao-titulo">{{ icon('user') }} Dados pessoais</div>
+    <div class="grade-formulario">
+      <div class="campo"><label for="nome">Nome completo</label><input id="nome" name="nome" value="{{ c.nome if c else '' }}" placeholder="Nome e sobrenome" required></div>
+      <div class="campo"><label for="cpf">CPF</label><input id="cpf" name="cpf" value="{{ c.cpf if c else '' }}" placeholder="000.000.000-00"></div>
+      <div class="campo"><label for="nascimento">Data de nascimento</label><input id="nascimento" type="date" name="nascimento" value="{{ (c.nascimento or '')[:10] if c else '' }}"></div>
+      <div class="campo"><label for="telefone">Telefone / WhatsApp</label><input id="telefone" name="telefone" value="{{ c.telefone if c else '' }}" placeholder="(11) 99999-9999" required></div>
+      <div class="campo"><label for="email">E-mail</label><input id="email" type="email" name="email" value="{{ c.email if c else '' }}" placeholder="nome@email.com"></div>
+      <div class="campo"><label for="status">Status</label><select id="status" name="status">{% for opcao in ['novo','ativo','contato','aguardando','convocado','contratado','reprovado'] %}<option value="{{ opcao }}" {{ 'selected' if c and c.status == opcao }}>{{ opcao|capitalize }}</option>{% endfor %}</select></div>
+    </div>
+  </section>
+
+  <section class="painel">
+    <div class="secao-titulo">{{ icon('map') }} Localização</div>
+    <div class="grade-formulario">
+      <div class="campo"><label for="cidade">Cidade</label><input id="cidade" name="cidade" value="{{ c.cidade if c else '' }}" placeholder="Campinas"></div>
+      <div class="campo"><label for="estado">Estado</label><input id="estado" name="estado" value="{{ c.estado if c else '' }}" placeholder="SP" maxlength="2"></div>
+      <div class="campo" style="grid-column:1 / -1"><label for="endereco">Endereço</label><input id="endereco" name="endereco" value="{{ c.endereco if c else '' }}" placeholder="Rua, número, bairro"></div>
+    </div>
+  </section>
+
+  <section class="painel">
+    <div class="secao-titulo">{{ icon('briefcase') }} Perfil profissional</div>
+    <div class="grade-formulario">
+      <div class="campo"><label for="escolaridade">Escolaridade</label><select id="escolaridade" name="escolaridade"><option value="">Selecione</option>{% for opcao in ['Fundamental','Médio','Superior','Pós-graduação','MBA'] %}<option value="{{ opcao }}" {{ 'selected' if c and c.escolaridade == opcao }}>{{ opcao }}</option>{% endfor %}</select></div>
+      <div class="campo"><label for="vaga">Vaga de interesse</label><input id="vaga" name="vaga" value="{{ c.vaga if c else '' }}" placeholder="Analista de RH"></div>
+      <div class="campo" style="grid-column:1 / -1"><label for="experiencia">Experiência profissional</label><textarea id="experiencia" name="experiencia" placeholder="Resuma a experiência relevante">{{ c.experiencia if c else '' }}</textarea></div>
+      <div class="campo" style="grid-column:1 / -1"><label for="observacoes">Observações</label><textarea id="observacoes" name="observacoes" placeholder="Informações adicionais sobre o candidato">{{ c.observacoes if c else '' }}</textarea></div>
+    </div>
+  </section>
+
+  <section class="painel">
+    <div class="secao-titulo">{{ icon('file') }} Currículo</div>
+    <div class="upload-zona">
+      <span class="upload-icone">{{ icon('upload') }}</span>
+      <strong class="upload-titulo">Anexar currículo</strong>
+      <p class="upload-texto">Selecione um arquivo PDF ou DOCX para associar ao cadastro.</p>
+      <div class="formatos"><span class="formato">PDF</span><span class="formato">DOCX</span></div>
+      <input type="file" name="curriculo" accept=".pdf,.docx" style="margin-top:14px">
+      {% if c and c.curriculo %}<span class="celula-suave">Arquivo atual: {{ c.curriculo.split('/')[-1] }}</span>{% endif %}
+    </div>
+  </section>
+
+  <div class="form-acoes">
+    <a href="{{ url_for('principal.candidatos') }}" class="btn btn-fantasma">Cancelar</a>
+    <button type="submit" class="btn btn-primario">{{ icon('check') }} {{ 'Salvar alterações' if c else 'Cadastrar candidato' }}</button>
+  </div>
+</form>

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block titulo %}Currículos Recebidos · Mendes RH{% endblock %}
+{% block conteudo %}
+{% from "_icons.html" import icon %}
+<header class="pagina-cabecalho">
+  <div class="pagina-titulo">
+    <h1>Currículos Recebidos</h1>
+    <p class="pagina-subtitulo">Candidatos que enviaram currículo para as vagas da sua empresa no InfoJobs.</p>
+  </div>
+</header>
+
+{% if not conectado %}
+  <div class="aviso erro">{{ icon('lock') }} <span>Conecte sua conta <strong>InfoJobs Empresa</strong> em Configurações para consultar os inscritos das suas vagas.</span></div>
+  <div class="form-acoes"><a href="{{ url_for('principal.configuracoes') }}" class="btn btn-primario">{{ icon('settings') }} Configurar conexão</a></div>
+{% endif %}
+
+<form method="post" action="{{ url_for('principal.pagina_scraping') }}" class="painel" style="margin-top:16px">
+  <input type="hidden" name="acao" value="descobrir">
+  <div class="secao-titulo">{{ icon('briefcase') }} Minhas vagas publicadas</div>
+  <p class="painel-subtitulo">O sistema localiza as vagas da sua área de empresa usando a sessão conectada.</p>
+  <div class="form-acoes"><button type="submit" class="btn btn-secundario" {{ 'disabled' if not conectado }}>{{ icon('search') }} Descobrir minhas vagas</button></div>
+</form>
+
+{% if vagas %}
+<section class="painel" style="margin-top:16px">
+  <div class="painel-cabecalho"><div class="painel-titulo"><h2>Vagas encontradas</h2><p class="painel-subtitulo">{{ vagas|length }} vaga(s) na sua Área Empresa.</p></div></div>
+  <div class="resultados">
+    {% for vaga in vagas %}
+      <article class="resultado-card">
+        <div class="resultado-cabecalho"><strong>{{ vaga.titulo }}</strong></div>
+        <div class="resultado-meta"><span>{{ icon('external') }} {{ vaga.url }}</span></div>
+        <div class="resultado-acoes">
+          <form method="post" action="{{ url_for('principal.pagina_scraping') }}">
+            <input type="hidden" name="url_vaga" value="{{ vaga.url }}">
+            <button type="submit" class="btn btn-primario btn-pequeno">{{ icon('users') }} Ver inscritos</button>
+          </form>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<form method="post" action="{{ url_for('principal.pagina_scraping') }}" class="painel" style="margin-top:16px">
+  <div class="secao-titulo">{{ icon('users') }} Inscritos da vaga</div>
+  <div class="filtros">
+    <div class="campo" style="grid-column:1 / -1"><label for="url_vaga">URL da vaga na Área Empresa</label><input id="url_vaga" name="url_vaga" value="{{ url or '' }}" placeholder="https://www.infojobs.com.br/..."></div>
+    <div class="campo"><label for="limite">Limite</label><input id="limite" type="number" name="limite" value="30" min="1" max="100"></div>
+  </div>
+  <div class="form-acoes"><button type="submit" class="btn btn-primario" {{ 'disabled' if not conectado }}>{{ icon('search') }} Buscar candidatos inscritos</button></div>
+</form>
+
+<section class="painel" style="margin-top:16px">
+  <div class="painel-cabecalho">
+    <div class="painel-titulo">
+      <h2>Candidatos inscritos</h2>
+      <p class="painel-subtitulo">{% if resultados %}{{ resultados|length }} candidato(s) encontrado(s).{% else %}Os currículos recebidos aparecerão aqui.{% endif %}</p>
+    </div>
+  </div>
+  {% if resultados %}
+    <div class="resultados">
+      {% for r in resultados %}
+        <article class="resultado-card">
+          <div class="resultado-cabecalho"><strong>{{ r.nome }}</strong><span class="etiqueta">InfoJobs Empresa</span></div>
+          <div class="resultado-meta">
+            <span>{{ icon('phone') }} {{ r.telefone or '—' }}</span>
+            <span>{{ icon('map') }} {{ r.cidade or '—' }}</span>
+          </div>
+          <p class="painel-subtitulo" style="margin-top:8px">{{ r.resumo }}</p>
+          <div class="resultado-acoes">
+            {% if r.link %}<a href="{{ r.link }}" target="_blank" rel="noopener" class="btn btn-secundario btn-pequeno">{{ icon('external') }} Abrir currículo</a>{% endif %}
+            <a href="{{ url_for('principal.novo_candidato') }}" class="btn btn-primario btn-pequeno">{{ icon('plus') }} Importar candidato</a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="estado-vazio">{{ icon('users') }}<strong>Nenhum candidato carregado</strong><p>Descubra suas vagas e consulte os inscritos de uma delas.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

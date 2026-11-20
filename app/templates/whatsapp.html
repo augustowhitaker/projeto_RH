@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block titulo %}Mensagens WhatsApp · Mendes RH{% endblock %}
+{% block conteudo %}
+{% from "_icons.html" import icon %}
+<header class="pagina-cabecalho">
+  <div class="pagina-titulo">
+    <h1>Mensagens WhatsApp</h1>
+    <p class="pagina-subtitulo">Organize grupos ou converse individualmente com cada candidato.</p>
+  </div>
+  <div class="acoes-pagina">
+    <a href="{{ url_for('principal.exportar') }}" class="btn btn-secundario">{{ icon('download') }} Exportar lista</a>
+    <button type="button" class="btn btn-secundario" id="copiar-numeros">{{ icon('copy') }} Copiar números</button>
+  </div>
+</header>
+
+<div class="duas-colunas">
+  <section class="painel">
+    <div class="painel-cabecalho"><div class="painel-titulo"><h2>Status da conexão</h2><p class="painel-subtitulo">Integração com WhatsApp Web para grupos e mensagens individuais.</p></div></div>
+    {% if not situacao.verificado %}
+      <div class="aviso info">{{ icon('clock') }} <span>Conexão não verificada nesta sessão. Consulte o status antes de gerar o QR code.</span></div>
+      <div class="form-acoes"><a href="{{ url_for('principal.status_whatsapp') }}" class="btn btn-primario">{{ icon('message') }} Verificar conexão</a></div>
+    {% elif situacao.logado %}
+      <div class="aviso sucesso">{{ icon('check-circle') }} <span>Conectado ao WhatsApp Web. Você já pode organizar grupos e enviar mensagens.</span></div>
+      <form method="post" action="{{ url_for('principal.desconectar_whatsapp') }}" style="margin-top:14px">
+        <button type="submit" class="btn btn-secundario btn-pequeno">{{ icon('log-out') }} Desconectar e gerar QR</button>
+      </form>
+    {% else %}
+      <div class="aviso erro">{{ icon('x-circle') }} <span>Não conectado. Escaneie o QR code com o celular.</span></div>
+      {% if situacao.erro %}<div class="aviso info">{{ icon('bell') }} <span>{{ situacao.erro }}</span></div>{% endif %}
+      <div style="display:flex; gap:18px; align-items:center; margin-top:16px">
+        <img src="{{ url_for('principal.whatsapp_qr') }}" alt="QR Code do WhatsApp Web" style="width:190px;height:190px;border:1px solid var(--borda);border-radius:12px">
+        <div><p class="upload-texto">Abra o WhatsApp no celular, acesse Aparelhos conectados e escaneie o código.</p><a href="{{ url_for('principal.status_whatsapp') }}" class="btn btn-secundario btn-pequeno" style="margin-top:12px">{{ icon('clock') }} Atualizar status</a></div>
+      </div>
+    {% endif %}
+  </section>
+
+  <aside class="painel">
+    <div class="painel-cabecalho"><div class="painel-titulo"><h2>Mensagens enviadas</h2><p class="painel-subtitulo">Histórico de conversas individuais.</p></div></div>
+    {% if mensagens %}
+      <div class="modulos-grid">
+        {% for m in mensagens[:12] %}
+          <div class="chave-valor"><span>{{ m.candidato_nome or m.telefone }}</span><strong>{{ m.criado_em[:16] }}</strong><small>{{ m.mensagem[:90] }}{% if m.mensagem|length > 90 %}...{% endif %}</small></div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="estado-vazio">{{ icon('message') }}<strong>Nenhuma mensagem individual</strong><p>Use o formulário abaixo para conversar com um candidato.</p></div>
+    {% endif %}
+  </aside>
+</div>
+
+<form method="post" action="{{ url_for('principal.enviar_mensagem') }}" class="painel" style="margin-top:16px" id="form-individual">
+  <div class="secao-titulo">{{ icon('user') }} Mensagem individual</div>
+  <p class="painel-subtitulo">A mensagem é enviada diretamente na conversa do candidato selecionado.</p>
+  <div class="filtros">
+    <div class="campo"><label for="candidato-individual">Candidato</label>
+      <select id="candidato-individual" name="candidato_id" required>
+        <option value="">Selecione um candidato</option>
+        {% for c in candidatos %}
+          <option value="{{ c.id }}" data-telefone="{{ c.telefone }}" {{ 'selected' if c.id == candidato_selecionado }}>{{ c.nome }} — +55 {{ c.telefone }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="campo"><label for="telefone-individual">Telefone</label><input id="telefone-individual" type="text" readonly></div>
+  </div>
+  <div class="campo" style="margin-top:14px"><label for="mensagem-individual">Mensagem</label><textarea id="mensagem-individual" name="mensagem" rows="4" placeholder="Olá, gostaríamos de conversar sobre sua candidatura..." required></textarea></div>
+  <div class="form-acoes"><button type="submit" class="btn btn-primario">{{ icon('message') }} Enviar mensagem individual</button></div>
+</form>
+
+<form method="post" action="{{ url_for('principal.criar_grupo') }}" id="form-grupo" style="margin-top:16px">
+  <section class="painel">
+    <div class="secao-titulo">{{ icon('plus') }} Criar grupo interno</div>
+    <div class="filtros">
+      <div class="campo"><label for="nome-grupo">Nome do grupo</label><input id="nome-grupo" name="nome" value="Mutirão de Empregos — Campinas" required></div>
+      <div class="campo"><label for="cidade-grupo">Cidade</label><input id="cidade-grupo" name="cidade" placeholder="Campinas"></div>
+      <div class="campo"><label for="vaga-grupo">Vaga</label><input id="vaga-grupo" name="vaga" placeholder="Analista de RH"></div>
+      <div class="campo"><label for="data-grupo">Data do processo</label><input id="data-grupo" type="date" name="data"></div>
+    </div>
+    <div class="campo" style="margin-top:14px"><label for="descricao-grupo">Descrição</label><textarea id="descricao-grupo" name="mensagem" placeholder="Mensagem de saudação ou observações do grupo">{{ mensagem or '' }}</textarea></div>
+    <div class="form-acoes"><button type="submit" class="btn btn-secundario">{{ icon('users') }} Criar grupo com selecionados</button></div>
+  </section>
+
+  <section class="painel" style="margin-top:16px">
+    <div class="painel-cabecalho">
+      <div class="painel-titulo"><h2>Contatos</h2><p class="painel-subtitulo">Marque candidatos para o grupo ou use “Conversar” para uma mensagem individual.</p></div>
+    </div>
+    <div class="tabela-wrap">
+      <table class="tabela">
+        <thead><tr><th></th><th>Nome</th><th>Telefone</th><th>Cidade</th><th>Status do convite</th><th>Participação</th><th>Ações</th></tr></thead>
+        <tbody>
+          {% for c in candidatos %}
+            <tr>
+              <td><input type="checkbox" name="selecionados" value="{{ c.id }}" class="campo-check selecionar-numero" data-telefone="{{ c.telefone }}"></td>
+              <td class="celula-forte">{{ c.nome }}</td>
+              <td>+55 {{ c.telefone }}</td>
+              <td>{{ c.cidade or '—' }}</td>
+              <td><span class="status status-aguardando">Pendente</span></td>
+              <td><span class="status status-novo">Não confirmado</span></td>
+              <td><a href="{{ url_for('principal.pagina_whatsapp', candidato=c.id) }}" class="botao-acao" title="Conversar individualmente">{{ icon('message') }}</a></td>
+            </tr>
+          {% else %}
+            <tr><td colspan="7" class="vazio">Nenhum candidato com telefone disponível.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</form>
+
+<script>
+  const selecionado = document.getElementById('candidato-individual');
+  const telefone = document.getElementById('telefone-individual');
+  const atualizarTelefone = () => {
+    const opcao = selecionado.selectedOptions[0];
+    telefone.value = opcao && opcao.dataset.telefone ? '+55 ' + opcao.dataset.telefone : '';
+  };
+  selecionado.addEventListener('change', atualizarTelefone);
+  atualizarTelefone();
+
+  document.getElementById('copiar-numeros').addEventListener('click', () => {
+    const numeros = [...document.querySelectorAll('.selecionar-numero:checked')].map(item => '55' + item.dataset.telefone);
+    if (!numeros.length) { alert('Selecione pelo menos um candidato.'); return; }
+    navigator.clipboard.writeText(numeros.join('\n'));
+  });
+</script>
+{% endblock %}

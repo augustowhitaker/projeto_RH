@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titulo %}Cadastrar Candidato · Mendes RH{% endblock %}
+{% block conteudo %}
+{% from "_icons.html" import icon %}
+<header class="pagina-cabecalho">
+  <div class="pagina-titulo">
+    <h1>Cadastrar Candidato</h1>
+    <p class="pagina-subtitulo">Organize as informações do talento em seções para manter o cadastro completo e fácil de consultar.</p>
+  </div>
+</header>
+{% include "_candidato_form.html" %}
+{% endblock %}

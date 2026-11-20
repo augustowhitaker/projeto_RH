@@ -1,0 +1,16 @@
+services:
+  mendes-rh:
+    build: .
+    container_name: mendes-rh
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/data
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-mendes-rh-troque-esta-chave}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+      ADMIN_NOME: ${ADMIN_NOME:-admin}
+      WHATSAPP_CDP_URL: http://127.0.0.1:9222
+      INFOJOBS_SEARCH_URL: ${INFOJOBS_SEARCH_URL:-}
+    restart: unless-stopped

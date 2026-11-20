@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titulo %}Grupos Criados · Mendes RH{% endblock %}
+{% block conteudo %}
+{% from "_icons.html" import icon %}
+<header class="pagina-cabecalho">
+  <div class="pagina-titulo">
+    <h1>Grupos Criados</h1>
+    <p class="pagina-subtitulo">Histórico dos grupos internos organizados pela equipe.</p>
+  </div>
+  <div class="acoes-pagina"><a href="{{ url_for('principal.pagina_whatsapp') }}" class="btn btn-primario">{{ icon('plus') }} Organizar grupos</a></div>
+</header>
+
+<section class="painel">
+  <div class="tabela-wrap">
+    <table class="tabela">
+      <thead><tr><th>Grupo</th><th>Participantes</th><th>Criado em</th><th>Responsável</th><th>Ações</th></tr></thead>
+      <tbody>
+        {% for g in grupos %}
+          <tr>
+            <td class="celula-forte">{{ g.nome }}</td>
+            <td>{{ g.participantes }}</td>
+            <td>{{ g.criado_em[:16] }}</td>
+            <td>{{ g.usuario_nome or 'Equipe Mendes RH' }}</td>
+            <td><a href="{{ url_for('principal.pagina_whatsapp') }}" class="botao-acao" title="Ver grupo">{{ icon('eye') }}</a></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="vazio">Nenhum grupo criado até o momento.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

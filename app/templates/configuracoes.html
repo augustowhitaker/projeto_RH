@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block titulo %}Configurações · Mendes RH{% endblock %}
+{% block conteudo %}
+{% from "_icons.html" import icon %}
+<header class="pagina-cabecalho">
+  <div class="pagina-titulo">
+    <h1>Configurações</h1>
+    <p class="pagina-subtitulo">Preferências, integrações e controle de acesso da plataforma.</p>
+  </div>
+</header>
+
+<div class="config-grid">
+  <section class="config-card">
+    <h3>{{ icon('building') }} Dados da empresa</h3>
+    <p>Informações institucionais exibidas em todo o ambiente.</p>
+    <div class="chave-valor"><span>Nome</span><strong>Mendes RH</strong></div>
+    <div class="chave-valor"><span>Slogan</span><strong>Conectando pessoas. Construindo futuros.</strong></div>
+    <div class="chave-valor"><span>Ambiente</span><strong>Produção</strong></div>
+  </section>
+
+  <section class="config-card">
+    <h3>{{ icon('users') }} Funcionários</h3>
+    <p>Usuários com acesso ao sistema.</p>
+    <div class="linha-config"><div><span>{{ session.get('usuario_nome','Usuário') }}</span><small>Administrador · ativo</small></div><span class="status status-ativo">Ativo</span></div>
+    <div class="linha-config"><div><span>Equipe de recrutamento</span><small>Perfil operacional</small></div><span class="status status-novo">Padrão</span></div>
+  </section>
+
+  <section class="config-card">
+    <h3>{{ icon('shield') }} Permissões</h3>
+    <p>Controle o que cada perfil pode visualizar e alterar.</p>
+    <div class="linha-config"><div><span>Administrador</span><small>Acesso completo</small></div><input type="checkbox" checked class="campo-check"></div>
+    <div class="linha-config"><div><span>Recrutador</span><small>Candidatos e mutirões</small></div><input type="checkbox" checked class="campo-check"></div>
+    <div class="linha-config"><div><span>Visualizador</span><small>Somente consulta</small></div><input type="checkbox" class="campo-check"></div>
+  </section>
+
+  <section class="config-card">
+    <h3>{{ icon('sliders') }} Preferências</h3>
+    <p>Ajustes gerais de comportamento da plataforma.</p>
+    <div class="linha-config"><div><span>Notificações visuais</span><small>Avisos no topo da interface</small></div><input type="checkbox" checked class="campo-check"></div>
+    <div class="linha-config"><div><span>Registro de atividades</span><small>Histórico de alterações</small></div><input type="checkbox" checked class="campo-check"></div>
+  </section>
+
+  <section class="config-card">
+    <h3>{{ icon('message') }} Integrações</h3>
+    <p>Serviços conectados ao ambiente Mendes RH.</p>
+    <div class="linha-config"><div><span>WhatsApp Web</span><small>Organização de grupos</small></div><a href="{{ url_for('principal.pagina_whatsapp') }}" class="btn btn-secundario btn-pequeno">Gerenciar</a></div>
+    <div class="linha-config"><div><span>InfoJobs</span><small>Busca de currículos</small></div><a href="{{ url_for('principal.pagina_scraping') }}" class="btn btn-secundario btn-pequeno">Configurar</a></div>
+  </section>
+
+  <section class="config-card" style="grid-column:1 / -1">
+    <h3>{{ icon('lock') }} Conexão InfoJobs Empresa</h3>
+    <p>Use o cookie da sua sessão autenticada para consultar os candidatos inscritos nas suas vagas. O valor fica apenas neste servidor e não é exibido na tela.</p>
+    <div class="linha-config"><div><span>Status da conexão</span><small>{{ 'Conectado à Área Empresa' if infojobs_conectado else 'Não conectado' }}</small></div><span class="status {{ 'status-ativo' if infojobs_conectado else 'status-novo' }}">{{ 'Conectado' if infojobs_conectado else 'Pendente' }}</span></div>
+    <form method="post" action="{{ url_for('principal.configuracoes') }}" style="margin-top:14px">
+      <div class="campo"><label for="cookie_infojobs">Cookie da sessão InfoJobs</label><textarea id="cookie_infojobs" name="cookie_infojobs" rows="3" placeholder="Cole aqui o cookie da conta empresarial"></textarea></div>
+      <div class="form-acoes" style="margin-top:12px">
+        <button type="submit" class="btn btn-primario btn-pequeno">{{ icon('check') }} Salvar cookie</button>
+        <button type="submit" name="inspecionar_infojobs" value="1" class="btn btn-secundario btn-pequeno">{{ icon('search') }} Testar conexão</button>
+        <button type="submit" name="limpar_infojobs" value="1" class="btn btn-perigo btn-pequeno">{{ icon('trash') }} Remover</button>
+      </div>
+    </form>
+    {% if inspecao %}
+      <div class="aviso info" style="margin-top:14px"><span>URL verificada: {{ inspecao.url or '—' }}{% if inspecao.corpo %}<br>{{ inspecao.corpo[:220] }}{% endif %}</span></div>
+      {% if inspecao.links %}
+        <div class="chave-valor"><span>Links encontrados</span><strong>{{ inspecao.links|length }}</strong></div>
+        {% for link in inspecao.links[:10] %}<div class="linha-config"><div><span>{{ link.texto or 'Link' }}</span><small>{{ link.href }}</small></div></div>{% endfor %}
+      {% endif %}
+    {% endif %}
+  </section>
+
+  <section class="config-card">
+    <h3>{{ icon('lock') }} Segurança e acesso</h3>
+    <p>Proteção da conta e da sessão de trabalho.</p>
+    <div class="linha-config"><div><span>Sessão atual</span><small>Autenticada via login Mendes RH</small></div><span class="status status-ativo">Segura</span></div>
+    <div class="form-acoes" style="margin-top:18px"><a href="{{ url_for('principal.logout') }}" class="btn btn-perigo">{{ icon('log-out') }} Encerrar sessão</a></div>
+  </section>
+</div>
+{% endblock %}

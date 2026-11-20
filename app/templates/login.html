@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#21150F">
+<title>Mendes RH | Acesso ao Sistema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+
+<body>
+
+<main class="login-page">
+
+    <section class="brand-section">
+
+        <div class="office-decoration"></div>
+
+        <div class="brand-content">
+
+            <div class="brand-logo">
+
+                <svg class="logo-symbol"
+                     viewBox="0 0 120 120"
+                     fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+
+                    <defs>
+                        <linearGradient id="goldGradient"
+                            x1="0" y1="0" x2="120" y2="120">
+                            <stop offset="0%" stop-color="#F1D09A"/>
+                            <stop offset="50%" stop-color="#D9A45F"/>
+                            <stop offset="100%" stop-color="#986333"/>
+                        </linearGradient>
+                    </defs>
+
+                    <path d="M12 100V22L60 65L108 22V100"
+                          stroke="url(#goldGradient)"
+                          stroke-width="13"
+                          stroke-linecap="square"
+                          stroke-linejoin="miter"/>
+
+                </svg>
+
+                <div class="logo-text">
+                    <h1>Mendes</h1>
+                    <span>RH</span>
+                </div>
+
+            </div>
+
+            <p class="brand-slogan">
+                Conectando pessoas.<br>
+                Construindo <strong>futuros.</strong>
+            </p>
+
+        </div>
+
+    </section>
+
+    <section class="form-section">
+
+        <div class="login-card">
+
+            <div class="login-icon">
+
+                <svg viewBox="0 0 64 64"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <circle cx="32" cy="19" r="9"/>
+
+                    <path d="M13 52V47C13 37 21 31 32 31C43 31 51 37 51 47V52"/>
+
+                    <path d="M10 22C10 15 14 11 20 11"/>
+                    <path d="M54 22C54 15 50 11 44 11"/>
+
+                </svg>
+
+            </div>
+
+            <header class="login-header">
+                <h2>Bem-vindo!</h2>
+                <p>Acesse o sistema da Mendes RH</p>
+            </header>
+
+            <form id="loginForm" method="post" action="{{ url_for('principal.login') }}">
+
+                <div class="form-group">
+
+                    <div class="input-wrapper">
+
+                        <svg class="input-icon"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.8">
+
+                            <circle cx="12" cy="8" r="4"/>
+                            <path d="M4 21V19C4 15 7 13 12 13C17 13 20 15 20 19V21"/>
+
+                        </svg>
+
+                        <input
+                            type="text"
+                            id="username"
+                            name="email"
+                            placeholder="Usuário ou E-mail"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <div class="input-wrapper">
+
+                        <svg class="input-icon"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.8">
+
+                            <rect x="4" y="10" width="16" height="11" rx="2"/>
+                            <path d="M8 10V7A4 4 0 0 1 16 7V10"/>
+                            <path d="M12 14V17"/>
+
+                        </svg>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="senha"
+                            placeholder="Senha"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="togglePassword"
+                            aria-label="Mostrar senha"
+                        >
+
+                            <svg id="eyeIcon"
+                                 width="23"
+                                 height="23"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="1.8">
+
+                                <path d="M2 12S5 5 12 5S22 12 22 12S19 19 12 19S2 12 2 12Z"/>
+                                <circle cx="12" cy="12" r="3"/>
+
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="form-options">
+
+                    <label class="remember">
+                        <input type="checkbox" id="remember" name="lembrar">
+                        Lembrar-me
+                    </label>
+
+                    <a href="#" class="forgot-password"
+                       id="forgotPassword">
+                        Esqueceu sua senha?
+                    </a>
+
+                </div>
+
+                <button type="submit"
+                        class="btn-login"
+                        id="loginButton">
+
+                    Entrar
+
+                    <svg width="24"
+                         height="24"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2">
+
+                        <path d="M10 17L15 12L10 7"/>
+                        <path d="M15 12H3"/>
+                        <path d="M14 3H20A1 1 0 0 1 21 4V20A1 1 0 0 1 20 21H14"/>
+
+                    </svg>
+
+                </button>
+
+                {% with mensagens = get_flashed_messages(with_categories=true) %}
+                    {% set ultima = mensagens[-1] if mensagens else none %}
+                    <div class="feedback {% if ultima %}{{ 'error' if ultima[0] == 'erro' else 'info' }}{% endif %}"
+                         id="feedback"
+                         role="status"
+                         aria-live="polite">{% if ultima %}{{ ultima[1] }}{% endif %}</div>
+                {% endwith %}
+
+            </form>
+
+            <footer class="security-footer">
+
+                <div class="security-line">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="1.8">
+
+                        <path d="M12 2L20 5V11C20 16 16 20 12 22C8 20 4 16 4 11V5L12 2Z"/>
+                        <path d="M8 12L11 15L16 9"/>
+
+                    </svg>
+
+                </div>
+
+                <p>Sistema Seguro • Mendes RH</p>
+
+            </footer>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script>
+const form = document.getElementById("loginForm");
+
+const username = document.getElementById("username");
+const password = document.getElementById("password");
+
+const remember = document.getElementById("remember");
+
+const togglePassword =
+    document.getElementById("togglePassword");
+
+const eyeIcon = document.getElementById("eyeIcon");
+
+const feedback = document.getElementById("feedback");
+
+const loginButton =
+    document.getElementById("loginButton");
+
+
+togglePassword.addEventListener("click", () => {
+
+    const visible = password.type === "password";
+
+    password.type = visible ? "text" : "password";
+
+    togglePassword.setAttribute(
+        "aria-label",
+        visible ? "Ocultar senha" : "Mostrar senha"
+    );
+
+    eyeIcon.innerHTML = visible
+        ? `
+        <path d="M3 3L21 21"/>
+        <path d="M10.6 10.6A2 2 0 0 0 13.4 13.4"/>
+        <path d="M9.9 5.2A10.5 10.5 0 0 1 12 5C19 5 22 12 22 12S20.8 14.5 18.5 16.3"/>
+        <path d="M6.6 6.6C3.6 8.5 2 12 2 12S5 19 12 19C13.5 19 14.8 18.7 16 18"/>
+        `
+        : `
+        <path d="M2 12S5 5 12 5S22 12 22 12S19 19 12 19S2 12 2 12Z"/>
+        <circle cx="12" cy="12" r="3"/>
+        `;
+
+});
+
+
+try {
+
+    const savedUser = localStorage.getItem("mendes_saved_user");
+
+    if (savedUser) {
+        username.value = savedUser;
+        remember.checked = true;
+    }
+
+} catch (error) {
+    console.warn("Armazenamento local indisponível.");
+}
+
+
+function showFeedback(message, type = "info") {
+
+    feedback.textContent = message;
+
+    feedback.className = "feedback " + type;
+
+}
+
+
+document.getElementById("forgotPassword")
+    .addEventListener("click", (event) => {
+
+        event.preventDefault();
+
+        showFeedback(
+            "Entre em contato com o administrador para recuperar seu acesso.",
+            "info"
+        );
+
+    });
+
+
+form.addEventListener("submit", (event) => {
+
+    event.preventDefault();
+
+    feedback.className = "feedback";
+
+    const user = username.value.trim();
+    const pass = password.value;
+
+    if (!user || !pass) {
+
+        showFeedback(
+            "Preencha seu usuário e sua senha.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    if (remember.checked) {
+
+        localStorage.setItem(
+            "mendes_saved_user",
+            user
+        );
+
+    } else {
+
+        localStorage.removeItem("mendes_saved_user");
+
+    }
+
+    loginButton.disabled = true;
+    loginButton.textContent = "Verificando acesso...";
+
+    form.submit();
+
+});
+
+</script>
+
+</body>
+</html>

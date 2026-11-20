@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Mendes RH{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  {% from "_icons.html" import icon %}
+  <input type="checkbox" id="menu-mobile" class="menu-mobile-input" aria-label="Abrir menu">
+  <label for="menu-mobile" class="menu-mobile-fundo" aria-label="Fechar menu"></label>
+
+  <aside class="sidebar">
+    <div class="sidebar-topo">
+      <div class="marca">
+        <span class="marca-simbolo">M</span>
+        <span class="marca-texto">Mendes <strong>RH</strong></span>
+      </div>
+      <label for="menu-mobile" class="fechar-menu" aria-label="Fechar menu">{{ icon('close') }}</label>
+    </div>
+
+    <nav class="menu">
+      <a href="{{ url_for('principal.painel') }}" class="{{ 'ativo' if request.endpoint == 'principal.painel' }}">{{ icon('home') }}<span>Início</span></a>
+      <a href="{{ url_for('principal.candidatos') }}" class="{{ 'ativo' if request.endpoint == 'principal.candidatos' }}">{{ icon('users') }}<span>Candidatos</span></a>
+      <a href="{{ url_for('principal.novo_candidato') }}" class="{{ 'ativo' if request.endpoint == 'principal.novo_candidato' }}">{{ icon('user-plus') }}<span>Cadastrar Candidato</span></a>
+      <a href="{{ url_for('principal.importar') }}" class="{{ 'ativo' if request.endpoint == 'principal.importar' }}">{{ icon('upload') }}<span>Importar Excel</span></a>
+      <a href="{{ url_for('principal.pagina_scraping') }}" class="{{ 'ativo' if request.endpoint == 'principal.pagina_scraping' }}">{{ icon('search') }}<span>Buscar Currículos</span></a>
+      <a href="{{ url_for('principal.pagina_whatsapp') }}" class="{{ 'ativo' if request.endpoint == 'principal.pagina_whatsapp' }}">{{ icon('message') }}<span>Mensagens WhatsApp</span></a>
+      <a href="{{ url_for('principal.mutiroes') }}" class="{{ 'ativo' if request.endpoint == 'principal.mutiroes' }}">{{ icon('briefcase') }}<span>Mutirões de Emprego</span></a>
+      <a href="{{ url_for('principal.relatorios') }}" class="{{ 'ativo' if request.endpoint == 'principal.relatorios' }}">{{ icon('chart') }}<span>Relatórios</span></a>
+      <a href="{{ url_for('principal.configuracoes') }}" class="{{ 'ativo' if request.endpoint == 'principal.configuracoes' }}">{{ icon('settings') }}<span>Configurações</span></a>
+    </nav>
+
+    <div class="sidebar-rodape">
+      <span class="linha-dourada"></span>
+      <p>Conectando pessoas.<br>Construindo futuros.</p>
+      <small>Sistema seguro · Mendes RH</small>
+    </div>
+  </aside>
+
+  <div class="conteudo">
+    <header class="topbar">
+      <label for="menu-mobile" class="botao-menu" aria-label="Abrir menu">{{ icon('menu') }}</label>
+
+      <form method="get" action="{{ url_for('principal.candidatos') }}" class="busca-global">
+        {{ icon('search') }}
+        <input type="search" name="busca" placeholder="Buscar candidato, telefone ou cidade..." value="{{ request.args.get('busca','') }}">
+      </form>
+
+      <div class="acoes-topo">
+        <details class="dropdown">
+          <summary class="botao-icone" aria-label="Notificações">
+            {{ icon('bell') }}
+            <span class="ponto-notificacao"></span>
+          </summary>
+          <div class="dropdown-card">
+            <strong>Notificações</strong>
+            <p>Nenhuma nova notificação.</p>
+          </div>
+        </details>
+
+        <details class="dropdown perfil">
+          <summary class="perfil-resumo">
+            <span class="avatar">{{ session.get('usuario_nome','U')[:1] }}</span>
+            <span class="perfil-nome">{{ session.get('usuario_nome','Usuário') }}</span>
+            {{ icon('chevron-down', 'chevron') }}
+          </summary>
+          <div class="dropdown-card perfil-card">
+            <div class="perfil-info">
+              <strong>{{ session.get('usuario_nome','Usuário') }}</strong>
+              <span>Administrador</span>
+            </div>
+            <a href="{{ url_for('principal.configuracoes') }}">{{ icon('user') }} Meu perfil</a>
+            <a href="{{ url_for('principal.logout') }}" class="sair">{{ icon('log-out') }} Sair</a>
+          </div>
+        </details>
+      </div>
+    </header>
+
+    <main class="principal">
+      {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+          <div class="avisos">
+            {% for categoria, mensagem in mensagens %}
+              <div class="aviso {{ categoria }}">{{ icon('check-circle' if categoria == 'sucesso' else 'x-circle' if categoria == 'erro' else 'bell') }}<span>{{ mensagem }}</span></div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block conteudo %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

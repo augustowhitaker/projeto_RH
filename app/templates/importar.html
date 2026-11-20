@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block titulo %}Importar Excel · Mendes RH{% endblock %}
+{% block conteudo %}
+{% from "_icons.html" import icon %}
+<header class="pagina-cabecalho">
+  <div class="pagina-titulo">
+    <h1>Importação de Excel</h1>
+    <p class="pagina-subtitulo">Importe seus candidatos e mantenha a base atualizada em poucos passos.</p>
+  </div>
+</header>
+
+<form method="post" enctype="multipart/form-data" action="{{ url_for('principal.importar') }}" id="form-importar">
+  <section class="painel">
+    <label class="upload-zona" for="arquivo">
+      <span class="upload-icone">{{ icon('file') }}</span>
+      <strong class="upload-titulo">Importe seus candidatos</strong>
+      <p class="upload-texto">Arraste sua planilha Excel aqui ou clique para selecionar.</p>
+      <div class="formatos"><span class="formato">XLSX</span><span class="formato">XLS</span><span class="formato">CSV</span></div>
+      <input id="arquivo" type="file" name="arquivo" accept=".xlsx,.xls,.csv" required style="margin-top:16px">
+    </label>
+    <div class="arquivo-selecionado" id="arquivo-selecionado" style="display:none">
+      <div>{{ icon('file') }}<strong id="nome-arquivo"></strong><span id="info-arquivo">Pronto para importar</span></div>
+      <button type="submit" class="btn btn-primario">{{ icon('upload') }} Importar candidatos</button>
+    </div>
+  </section>
+
+  <div class="etapas">
+    <div class="etapa"><span class="etapa-numero">1</span><div><strong>Selecione o arquivo</strong><span>Escolha a planilha</span></div></div>
+    <div class="etapa"><span class="etapa-numero">2</span><div><strong>Confira os dados</strong><span>Pré-visualização automática</span></div></div>
+    <div class="etapa"><span class="etapa-numero">3</span><div><strong>Confirme a importação</strong><span>Registros salvos na base</span></div></div>
+  </div>
+
+  <section class="painel">
+    <div class="painel-cabecalho">
+      <div class="painel-titulo"><h2>Modelo aceito</h2><p class="painel-subtitulo">As colunas Nome e Telefone são obrigatórias. As demais são opcionais.</p></div>
+    </div>
+    <div class="tabela-wrap">
+      <table class="tabela">
+        <thead><tr><th>Nome</th><th>Telefone</th><th>Cidade</th><th>E-mail</th><th>Vaga</th></tr></thead>
+        <tbody><tr><td class="celula-forte">Lais Oliveira</td><td>(11) 95282-6111</td><td>São Paulo</td><td>lais@email.com</td><td>Analista de RH</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="painel">
+    <div class="painel-cabecalho"><div class="painel-titulo"><h2>Mapeamento de colunas</h2><p class="painel-subtitulo">A Mendes RH identifica automaticamente os campos da planilha.</p></div></div>
+    <div class="modulos-grid">
+      <div class="chave-valor"><span>Nome</span><strong>Coluna “Nome”</strong></div>
+      <div class="chave-valor"><span>Telefone</span><strong>Coluna “Telefone”</strong></div>
+      <div class="chave-valor"><span>Cidade</span><strong>Coluna “Cidade”</strong></div>
+      <div class="chave-valor"><span>E-mail</span><strong>Coluna “E-mail”</strong></div>
+    </div>
+  </section>
+</form>
+
+<script>
+  const entrada = document.getElementById('arquivo');
+  const caixa = document.getElementById('arquivo-selecionado');
+  const nome = document.getElementById('nome-arquivo');
+  const info = document.getElementById('info-arquivo');
+  entrada.addEventListener('change', () => {
+    if (entrada.files.length) {
+      nome.textContent = entrada.files[0].name;
+      info.textContent = 'Arquivo selecionado · pronto para importar';
+      caixa.style.display = 'flex';
+    } else {
+      caixa.style.display = 'none';
+    }
+  });
+</script>
+{% endblock %}

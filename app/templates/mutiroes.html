@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block titulo %}Mutirões de Emprego · Mendes RH{% endblock %}
+{% block conteudo %}
+{% from "_icons.html" import icon %}
+<header class="pagina-cabecalho">
+  <div class="pagina-titulo">
+    <h1>Mutirões de Emprego</h1>
+    <p class="pagina-subtitulo">Organize grandes processos de recrutamento em um único lugar.</p>
+  </div>
+</header>
+
+<section class="painel">
+  <div class="secao-titulo">{{ icon('plus') }} Novo mutirão</div>
+  <div class="filtros">
+    <div class="campo"><label for="nome-mutirao">Nome do mutirão</label><input id="nome-mutirao" placeholder="Mutirão de Empregos — Campinas"></div>
+    <div class="campo"><label for="empresa">Empresa contratante</label><input id="empresa" placeholder="Empresa parceira"></div>
+    <div class="campo"><label for="cidade-mutirao">Cidade</label><input id="cidade-mutirao" placeholder="Campinas"></div>
+    <div class="campo"><label for="endereco-mutirao">Endereço</label><input id="endereco-mutirao" placeholder="Local do evento"></div>
+    <div class="campo"><label for="data-mutirao">Data</label><input id="data-mutirao" type="date"></div>
+    <div class="campo"><label for="horario-mutirao">Horário</label><input id="horario-mutirao" type="time"></div>
+    <div class="campo"><label for="vagas-mutirao">Vagas disponíveis</label><input id="vagas-mutirao" type="number" min="0" placeholder="12"></div>
+    <div class="campo"><label for="responsavel">Responsável</label><input id="responsavel" placeholder="Nome do responsável"></div>
+  </div>
+  <div class="form-acoes"><button type="button" class="btn btn-primario">{{ icon('calendar') }} Criar mutirão</button></div>
+</section>
+
+<section class="painel">
+  <div class="painel-cabecalho">
+    <div class="painel-titulo"><h2>Eventos organizados</h2><p class="painel-subtitulo">Acompanhe convocados, confirmados e comparecimentos.</p></div>
+  </div>
+  <div class="estado-vazio">
+    {{ icon('briefcase') }}
+    <strong>Nenhum mutirão cadastrado</strong>
+    <p>Preencha os dados acima para planejar o primeiro evento e acompanhar os indicadores de participação.</p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block titulo %}{{ c.nome }} · Mendes RH{% endblock %}
+{% block conteudo %}
+{% from "_icons.html" import icon %}
+<header class="pagina-cabecalho">
+  <div class="pagina-titulo">
+    <h1>{{ c.nome }}</h1>
+    <p class="pagina-subtitulo">Cadastro realizado em {{ c.criado_em[:10] }} · Origem: {{ c.origem|capitalize }}.</p>
+  </div>
+  <div class="acoes-pagina">
+    <a href="{{ url_for('principal.editar_candidato', ident=c.id) }}" class="btn btn-primario">{{ icon('pencil') }} Editar cadastro</a>
+    <a href="{{ url_for('principal.pagina_whatsapp', candidato=c.id) }}" class="btn btn-secundario">{{ icon('message') }} Conversar no WhatsApp</a>
+    {% if c.link %}<a href="{{ url_for('principal.curriculo', ident=c.id) }}" class="btn btn-secundario">{{ icon('download') }} Baixar currículo</a>{% endif %}
+  </div>
+</header>
+
+<div class="modulos-grid">
+  <section class="painel">
+    <div class="secao-titulo">{{ icon('user') }} Dados pessoais</div>
+    <div class="chave-valor"><span>Nome completo</span><strong>{{ c.nome }}</strong></div>
+    <div class="chave-valor"><span>CPF</span><strong>{{ c.cpf or '—' }}</strong></div>
+    <div class="chave-valor"><span>Nascimento</span><strong>{{ (c.nascimento or '—')[:10] }}</strong></div>
+    <div class="chave-valor"><span>Telefone</span><strong>+55 {{ c.telefone }}</strong></div>
+    <div class="chave-valor"><span>E-mail</span><strong>{{ c.email or '—' }}</strong></div>
+    <div class="chave-valor"><span>Status</span><strong>{{ c.status|capitalize }}</strong></div>
+  </section>
+
+  <section class="painel">
+    <div class="secao-titulo">{{ icon('map') }} Localização</div>
+    <div class="chave-valor"><span>Cidade</span><strong>{{ c.cidade or '—' }}</strong></div>
+    <div class="chave-valor"><span>Estado</span><strong>{{ c.estado or '—' }}</strong></div>
+    <div class="chave-valor"><span>Endereço</span><strong>{{ c.endereco or '—' }}</strong></div>
+
+    <div class="secao-titulo" style="margin-top:24px">{{ icon('briefcase') }} Perfil profissional</div>
+    <div class="chave-valor"><span>Escolaridade</span><strong>{{ c.escolaridade or '—' }}</strong></div>
+    <div class="chave-valor"><span>Vaga de interesse</span><strong>{{ c.vaga or '—' }}</strong></div>
+    <div class="chave-valor"><span>Experiência</span><strong>{{ c.experiencia or '—' }}</strong></div>
+    <div class="chave-valor"><span>Observações</span><strong>{{ c.observacoes or '—' }}</strong></div>
+  </section>
+</div>
+{% endblock %}

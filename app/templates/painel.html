@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block titulo %}Início · Mendes RH{% endblock %}
+{% block conteudo %}
+{% from "_icons.html" import icon %}
+<section class="hero">
+  <div class="hero-conteudo">
+    <span class="hero-etiqueta">{{ icon('sparkles') }} Plataforma de talentos</span>
+    <h1>Bem-vindo ao Mendes RH!</h1>
+    <p>Sua plataforma completa para gestão de candidatos e comunicação com talentos.</p>
+    <a href="{{ url_for('principal.novo_candidato') }}" class="btn btn-primario">{{ icon('arrow-right') }} Começar agora</a>
+  </div>
+</section>
+
+<section class="indicadores">
+  <article class="indicador">
+    <div class="indicador-topo">
+      <span class="indicador-icone">{{ icon('users') }}</span>
+      <span class="indicador-rotulo">Total de candidatos</span>
+    </div>
+    <strong class="indicador-valor">{{ total }}</strong>
+    <div class="indicador-rodape"><span class="tendencia">{{ icon('trending') }} base ativa</span><span>cadastrados no sistema</span></div>
+  </article>
+  <article class="indicador">
+    <div class="indicador-topo">
+      <span class="indicador-icone">{{ icon('message') }}</span>
+      <span class="indicador-rotulo">Contatos via WhatsApp</span>
+    </div>
+    <strong class="indicador-valor">{{ whats }}</strong>
+    <div class="indicador-rodape"><span class="tendencia">{{ icon('trending') }} prontos para contato</span></div>
+  </article>
+  <article class="indicador">
+    <div class="indicador-topo">
+      <span class="indicador-icone">{{ icon('briefcase') }}</span>
+      <span class="indicador-rotulo">Vagas em aberto</span>
+    </div>
+    <strong class="indicador-valor">{{ vagas }}</strong>
+    <div class="indicador-rodape"><span class="tendencia">{{ icon('trending') }} oportunidades ativas</span></div>
+  </article>
+  <article class="indicador">
+    <div class="indicador-topo">
+      <span class="indicador-icone">{{ icon('check-circle') }}</span>
+      <span class="indicador-rotulo">Convocações</span>
+    </div>
+    <strong class="indicador-valor">{{ convocacoes }}</strong>
+    <div class="indicador-rodape"><span class="tendencia">{{ icon('trending') }} processos em andamento</span></div>
+  </article>
+</section>
+
+<div class="duas-colunas">
+  <section class="painel">
+    <div class="painel-cabecalho">
+      <div class="painel-titulo">
+        <h2>Últimos candidatos</h2>
+        <p class="painel-subtitulo">Cadastros mais recentes na base Mendes RH.</p>
+      </div>
+      <a href="{{ url_for('principal.candidatos') }}" class="btn btn-secundario btn-pequeno">Ver todos</a>
+    </div>
+    <div class="tabela-wrap">
+      <table class="tabela">
+        <thead>
+          <tr><th>Nome completo</th><th>Telefone</th><th>Cidade</th><th>Vaga</th><th>Cadastro</th><th>Status</th><th>Ações</th></tr>
+        </thead>
+        <tbody>
+          {% for c in recentes %}
+            {% set rotulo = {'novo':'Novo','ativo':'Ativo','contato':'Em contato','aguardando':'Aguardando','convocado':'Convocado','contratado':'Contratado','reprovado':'Reprovado'}.get(c.status, 'Novo') %}
+            {% set classe = {'novo':'status-novo','ativo':'status-ativo','contato':'status-contato','aguardando':'status-aguardando','convocado':'status-convocado','contratado':'status-contratado','reprovado':'status-reprovado'}.get(c.status, 'status-novo') %}
+            <tr>
+              <td class="celula-forte">{{ c.nome }}</td>
+              <td>+55 {{ c.telefone }}</td>
+              <td>{{ c.cidade or '—' }}</td>
+              <td>{{ c.vaga or '—' }}</td>
+              <td class="celula-suave">{{ c.criado_em[:10] }}</td>
+              <td><span class="status {{ classe }}">{{ rotulo }}</span></td>
+              <td>
+                <div class="acoes-tabela">
+                  <a href="{{ url_for('principal.ver_candidato', ident=c.id) }}" class="botao-acao" title="Visualizar">{{ icon('eye') }}</a>
+                  <a href="{{ url_for('principal.editar_candidato', ident=c.id) }}" class="botao-acao" title="Editar">{{ icon('pencil') }}</a>
+                  <a href="{{ url_for('principal.pagina_whatsapp') }}" class="botao-acao" title="Abrir no WhatsApp">{{ icon('message') }}</a>
+                  {% if c.link %}<a href="{{ url_for('principal.curriculo', ident=c.id) }}" class="botao-acao" title="Baixar currículo">{{ icon('download') }}</a>{% endif %}
+                  <form method="post" action="{{ url_for('principal.excluir_candidato', ident=c.id) }}">
+                    <button type="submit" class="botao-acao perigo" title="Excluir" onclick="return confirm('Excluir este candidato?')">{{ icon('trash') }}</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="7" class="vazio">Nenhum candidato cadastrado ainda.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <aside>
+    <section class="painel">
+      <div class="painel-cabecalho"><div class="painel-titulo"><h2>Ações rápidas</h2></div></div>
+      <div class="acoes-rapidas">
+        <a href="{{ url_for('principal.novo_candidato') }}" class="acao-rapida">{{ icon('user-plus') }}<span>Cadastrar candidato</span>{{ icon('arrow-right') }}</a>
+        <a href="{{ url_for('principal.importar') }}" class="acao-rapida">{{ icon('upload') }}<span>Importar planilha Excel</span>{{ icon('arrow-right') }}</a>
+        <a href="{{ url_for('principal.pagina_scraping') }}" class="acao-rapida">{{ icon('search') }}<span>Buscar currículos</span>{{ icon('arrow-right') }}</a>
+        <a href="{{ url_for('principal.pagina_whatsapp') }}" class="acao-rapida">{{ icon('message') }}<span>Mensagens WhatsApp</span>{{ icon('arrow-right') }}</a>
+      </div>
+      <div class="destaque-lateral">
+        <h3>Mais eficiência no seu processo seletivo</h3>
+        <p>Gerencie talentos, importe planilhas e organize mutirões em um único ambiente.</p>
+      </div>
+    </section>
+  </aside>
+</div>
+{% endblock %}

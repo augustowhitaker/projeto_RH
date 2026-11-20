@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block titulo %}Relatórios · Mendes RH{% endblock %}
+{% block conteudo %}
+{% from "_icons.html" import icon %}
+<header class="pagina-cabecalho">
+  <div class="pagina-titulo">
+    <h1>Relatórios</h1>
+    <p class="pagina-subtitulo">Indicadores claros para acompanhar o desempenho dos processos seletivos.</p>
+  </div>
+  <div class="acoes-pagina"><a href="{{ url_for('principal.exportar') }}" class="btn btn-secundario">{{ icon('download') }} Exportar dados</a></div>
+</header>
+
+<section class="indicadores">
+  <article class="indicador">
+    <div class="indicador-topo"><span class="indicador-icone">{{ icon('users') }}</span><span class="indicador-rotulo">Candidatos</span></div>
+    <strong class="indicador-valor">{{ total }}</strong>
+    <div class="indicador-rodape">cadastrados na base</div>
+  </article>
+  <article class="indicador">
+    <div class="indicador-topo"><span class="indicador-icone">{{ icon('target') }}</span><span class="indicador-rotulo">Convocação</span></div>
+    <strong class="indicador-valor">{{ taxa_convocacao }}%</strong>
+    <div class="indicador-rodape">do total de candidatos</div>
+  </article>
+  <article class="indicador">
+    <div class="indicador-topo"><span class="indicador-icone">{{ icon('check-circle') }}</span><span class="indicador-rotulo">Contratação</span></div>
+    <strong class="indicador-valor">{{ taxa_contratacao }}%</strong>
+    <div class="indicador-rodape">do total de candidatos</div>
+  </article>
+  <article class="indicador">
+    <div class="indicador-topo"><span class="indicador-icone">{{ icon('briefcase') }}</span><span class="indicador-rotulo">Vagas ativas</span></div>
+    <strong class="indicador-valor">{{ vagas }}</strong>
+    <div class="indicador-rodape">oportunidades em aberto</div>
+  </article>
+</section>
+
+<div class="graficos">
+  <section class="grafico-card">
+    <h3>Candidatos por cidade</h3>
+    {% if por_cidade %}
+      <div class="barras">
+        {% for item in por_cidade %}
+          <div class="barra"><div class="barra-preenchimento" style="height:{{ item.percent }}%"></div><span>{{ item.nome }}</span></div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="estado-vazio">{{ icon('map') }}<strong>Sem dados de localização</strong><p>Cadastre candidatos com cidade para visualizar este gráfico.</p></div>
+    {% endif %}
+  </section>
+
+  <section class="grafico-card">
+    <h3>Origem dos candidatos</h3>
+    <div class="rosca-wrap">
+      <div class="rosca"><div class="rosca-centro"><strong>{{ total }}</strong><span>candidatos</span></div></div>
+      <div class="legenda">
+        {% for item in por_origem %}<div class="legenda-item"><span class="legenda-cor {{ 'bronze' if loop.index == 2 else 'claro' if loop.index > 2 }}"></span>{{ item.nome }} · {{ item.total }}</div>{% endfor %}
+        {% if not por_origem %}<div class="legenda-item">Nenhuma origem registrada.</div>{% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="grafico-card">
+    <h3>Candidatos por vaga</h3>
+    {% if por_vaga %}
+      <div class="barras">
+        {% for item in por_vaga %}
+          <div class="barra"><div class="barra-preenchimento" style="height:{{ item.percent }}%"></div><span>{{ item.nome }}</span></div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="estado-vazio">{{ icon('briefcase') }}<strong>Sem vagas informadas</strong><p>Informe a vaga de interesse no cadastro para gerar este indicador.</p></div>
+    {% endif %}
+  </section>
+
+  <section class="grafico-card">
+    <h3>Status dos processos</h3>
+    <div class="modulos-grid">
+      {% for item in por_status %}
+        <div class="chave-valor"><span>{{ item.nome }}</span><strong>{{ item.total }}</strong></div>
+      {% endfor %}
+      {% if not por_status %}<div class="vazio">Nenhum status registrado.</div>{% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

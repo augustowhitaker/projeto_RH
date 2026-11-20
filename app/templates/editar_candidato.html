@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titulo %}Editar Candidato · Mendes RH{% endblock %}
+{% block conteudo %}
+{% from "_icons.html" import icon %}
+<header class="pagina-cabecalho">
+  <div class="pagina-titulo">
+    <h1>Editar Candidato</h1>
+    <p class="pagina-subtitulo">Atualize os dados de {{ c.nome }}.</p>
+  </div>
+</header>
+{% include "_candidato_form.html" %}
+{% endblock %}
